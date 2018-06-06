@@ -1,0 +1,144 @@
+\documentclass[12pt]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage[a4paper,margin=1.0in,footskip=0.25in]{geometry}
+
+\makeatletter
+\newcommand{\verbatimfont}[1]{\renewcommand{\verbatim@font}{\ttfamily#1}}
+\author{Даниил Крачковский}
+
+
+\begin{document}
+
+
+	\begin{titlepage}
+		\centering
+		{\scshape\LARGE Численные методы математической физики \par}
+		\vfill
+		{\scshape\Large Лабораторная работа 1 \par}
+		\vspace{1cm}
+		{\huge\bfseries Разностные методы для ОДУ-2 \par}
+		\vspace{2cm}
+		{\Large Крачковский Даниил\par}
+		5 группа \par
+		\vspace{0.5cm}
+		Преподаватель:\par
+		Будник Анатолий Михайлович
+		\vfill
+		{\large \today}
+	\end{titlepage}
+	
+	
+\section*{Постановка задачи}
+	Дана задача ОДУ-2:
+	$$
+		y''(x) + y'(x) - \dfrac{2}{cos^2(x)}y(x) = \dfrac{1}{cos^2(x)}, \qquad x \in [0, 0.5]
+	$$
+	$$
+		y(0) = 0
+	$$
+	$$
+		y'(0.5) = cos^2(0.5)
+	$$
+	Решить задачу, приведённую выше, построив разностные схемы первого и второго порядков аппроксимации и решив полученные схемы методом разностной прогонки.
+\section*{Алгоритм}
+	\subsection*{Формула средних прямоугольников}
+	\[
+		I = \sum_{k=0}^{n-1} \int_{x_k}^{x_{k+1}} f(x)dx 
+	\]
+	\[
+		I \approx h  \sum_{k=0}^{n-1} f(\frac{x_k + x_{k+1}}{2})
+	\]
+	\[
+		R \leq h^2 \frac{b-a}{24} \max_{x \in [a, b]} f^{\prime\prime} (x)
+	\]
+	\[
+		h \geq \sqrt{\frac{24R}{(b-a) \max_{x \in [a, b]} f^{\prime\prime} (x)} }
+	\]
+	\subsection*{Формула Симпсона}
+	\[
+		I \approx \frac{h}{3} \left(f(x_0) + 4 \sum_{k=1}^{n/2} f(x_{2k -1}) + 2 \sum_{k=1}^{n/2 - 1} f(x_{2k}) + f(x_n)\right)
+	\]
+	\[
+		R \leq h^4 \frac{b-a}{180} \max_{x \in [a, b]} f^{IV} (x)
+	\]
+	\[
+		h \geq \sqrt[4]{\frac{180R}{(b-a) \max_{x \in [a, b]} f^{IV} (x)} }
+	\]
+	
+\section{Результат}
+Средних:
+\verbatimfont{\small}
+\begin{verbatim}
+h: 0.00894427190999916
+n: 111
+I: 0.6909220448382232
+\end{verbatim}
+Симпсона:
+\verbatimfont{\small}
+\begin{verbatim}
+h: 0.09306048591020996
+n: 10
+I: 0.47912965028132487
+\end{verbatim}
+\newpage
+\section{Листинг кода}
+\verbatimfont{\small}
+\begin{verbatim}
+import math
+
+
+def f_x(x):
+    p = 1.2
+    return math.sqrt(p + x ** 2) / (1. + math.cos(p * x))
+
+
+eps = 10. ** (-5)
+max_f_2 = 3.
+a = 0
+b = 1
+
+if __name__ == '__main__':
+    h = math.sqrt(24.*eps/max_f_2)
+    n = int(1. / h)
+    I = h * sum(f_x(a + k*h) for k in range(0, n - 1))
+
+    print('middle')
+    print('h: {}'.format(h))
+    print('n: {}'.format(n))
+    print('I: {}'.format(I))
+\end{verbatim}
+\newpage
+\verbatimfont{\small}
+\begin{verbatim}
+import math
+
+
+def f_x(x):
+    p = 1.2
+    return math.sqrt(p + x ** 2) / (1. + math.cos(p * x))
+
+
+eps = 10. ** (-5)
+max_f_4 = 24.
+a = 0
+b = 1
+
+if __name__ == '__main__':
+    h = (180. * eps / max_f_4) ** (1./4.)
+    n = int(1. / h)
+
+    sum_1 = sum(f_x(a + (2*k - 1)*h) for k in range(1, int(n / 2)))
+    sum_2 = sum(f_x(a + (2*k)*h) for k in range(1, int(n / 2) - 1))
+
+    I = h / 3. * (f_x(a) + f_x(b) + 4 * sum_1 + 2 * sum_2)
+
+    print('simpson')
+    print('h: {}'.format(h))
+    print('n: {}'.format(n))
+    print('I: {}'.format(I))
+\end{verbatim}
+\end{document}
