@@ -1,0 +1,166 @@
+\documentclass[12pt]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage[a4paper,margin=1.0in,footskip=0.25in]{geometry}
+
+\makeatletter
+\newcommand{\verbatimfont}[1]{\renewcommand{\verbatim@font}{\ttfamily#1}}
+\author{Даниил Крачковский}
+
+
+\begin{document}
+
+
+	\begin{titlepage}
+		\centering
+		{\scshape\LARGE Численные методы математической физики \par}
+		\vfill
+		{\scshape\Large Лабораторная работа 2 \par}
+		\vspace{1cm}
+		{\huge\bfseries Методы решения граничной задачи для ОДУ-2 \par}
+		\vspace{2cm}
+		{\Large Крачковский Даниил\par}
+		5 группа \par
+		\vspace{0.5cm}
+		Преподаватель:\par
+		Будник Анатолий Михайлович
+		\vfill
+		{\large \today}
+	\end{titlepage}
+	
+	
+\section*{Постановка задачи}
+	Дана задача ОДУ-2:
+	$$
+		((2-x)u'(x))' - x u(x) = sin(x) - 2cos(x), \qquad x \in [0, 1]
+	$$
+	$$
+		2u'(0) = u(0) - 1
+	$$
+	$$
+		-u'(1) = tg(1) u(1)
+	$$
+	Решить данную граничную задачу ОДУ-2 методом баланса и методом Ритца.
+\section*{Алгоритм}
+	\subsection*{Метод баланса}
+		Запишем схему, плученную данным методом, аппроксимирующую нашу задачу:
+		$$
+			\left( \dfrac{a_1}{h} - 1 + \dfrac{h}{2}d_0 \right) y_0 +
+			\left( \dfrac{a_1}{h} \right) y_1 =
+			- \left( 1 + \dfrac{h}{2}\varphi_0 \right)
+		$$
+		$$
+			\left( \dfrac{a_i}{h^2} \right) y_{i-1} -
+			\left( \dfrac{a_{i+1} + a_i}{h^2}  + d_i\right) y_i +
+			\left( \dfrac{a_{i+1}}{h^2} \right) y_{i+1} =
+			-\varphi_i
+			\qquad 
+			i = \overline{1, N-1}
+		$$
+		$$
+			\left( \dfrac{a_N}{h} \right) y_{N-1} +
+			\left( -\dfrac{a_N}{h} + tg(1) + \dfrac{h}{2} d_N \right) y_N =
+			\dfrac{h}{2}\varphi_N
+		$$
+		где $d_i$, $\varphi_i$, $a_i$ вычичляются по следующим формулам:
+		$$
+			d_0 = \dfrac{2}{h} \int_0^{h/2} x dx
+			\qquad
+			\varphi_0 = \dfrac{2}{h} \int_0^{h/2} (2cos(x) - sin(x)) dx
+		$$
+		$$
+			d_i = \dfrac{1}{h} \int_{x_i -h/2}^{x_i + h/2} x dx
+			\qquad
+			\varphi_i = \dfrac{1}{h} \int_{x_i -h/2}^{x_i + h/2} (2cos(x) - sin(x)) dx
+			\qquad
+			i = \overline{1, N- 1}
+		$$
+		$$ 
+			a_i = \left( \dfrac{1}{h} \int_{x_{i-1}}^{x_i} \dfrac{dx}{2-x} \right)^{-1}
+			\qquad
+			i = \overline{1, N}
+		$$
+		$$
+			d_N = \dfrac{2}{h} \int_{1-h/2}^1 x dx
+			\qquad
+			\varphi_N = \dfrac{2}{h} \int_{1-h/2}^1 (2cos(x) - sin(x)) dx
+		$$
+		Решим образовавшуюся систему методом прогонки.
+	\subsection*{Метод Ритца}
+	
+\section*{Результат}
+Средних:
+\verbatimfont{\small}
+\begin{verbatim}
+h: 0.00894427190999916
+n: 111
+I: 0.6909220448382232
+\end{verbatim}
+Симпсона:
+\verbatimfont{\small}
+\begin{verbatim}
+h: 0.09306048591020996
+n: 10
+I: 0.47912965028132487
+\end{verbatim}
+\newpage
+\section{Листинг кода}
+\verbatimfont{\small}
+\begin{verbatim}
+import math
+
+
+def f_x(x):
+    p = 1.2
+    return math.sqrt(p + x ** 2) / (1. + math.cos(p * x))
+
+
+eps = 10. ** (-5)
+max_f_2 = 3.
+a = 0
+b = 1
+
+if __name__ == '__main__':
+    h = math.sqrt(24.*eps/max_f_2)
+    n = int(1. / h)
+    I = h * sum(f_x(a + k*h) for k in range(0, n - 1))
+
+    print('middle')
+    print('h: {}'.format(h))
+    print('n: {}'.format(n))
+    print('I: {}'.format(I))
+\end{verbatim}
+\newpage
+\verbatimfont{\small}
+\begin{verbatim}
+import math
+
+
+def f_x(x):
+    p = 1.2
+    return math.sqrt(p + x ** 2) / (1. + math.cos(p * x))
+
+
+eps = 10. ** (-5)
+max_f_4 = 24.
+a = 0
+b = 1
+
+if __name__ == '__main__':
+    h = (180. * eps / max_f_4) ** (1./4.)
+    n = int(1. / h)
+
+    sum_1 = sum(f_x(a + (2*k - 1)*h) for k in range(1, int(n / 2)))
+    sum_2 = sum(f_x(a + (2*k)*h) for k in range(1, int(n / 2) - 1))
+
+    I = h / 3. * (f_x(a) + f_x(b) + 4 * sum_1 + 2 * sum_2)
+
+    print('simpson')
+    print('h: {}'.format(h))
+    print('n: {}'.format(n))
+    print('I: {}'.format(I))
+\end{verbatim}
+\end{document}
