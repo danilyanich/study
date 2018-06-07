@@ -90,6 +90,66 @@
 		$$
 		Решим образовавшуюся систему методом прогонки.
 	\subsection*{Метод Ритца}
+		Запишем схему, плученную данным методом, аппроксимирующую нашу задачу:
+		$$
+			\left( \dfrac{a_i}{h^2} \right) y_{i-1} - 
+			\left( \dfrac{a_{i} + a_{i+1}}{h^2} + d_i \right) y_i +
+			\left( \frac{ a_{i+1}}{h^2} \right) y_{i+1} =
+			-\varphi_i 
+			\qquad
+			i = \overline{0, N}
+		$$
+		где $d_i$, $\varphi_i$, $a_i$ вычичляются по следующим формулам:
+		$$
+			a_{i} =
+			\dfrac{1}{h}
+			\left(
+				\int_{x_{i-1}}^{x_i} k(x)dx -
+				\int_{x_{i-1}}^{x_i} q(x)(x_i-x)(x-x_{i-1})dx 
+			\right) 
+			\qquad 
+			i = \overline{1,N}
+		$$
+		$$
+			d_i=
+			\frac{1}{h^2}
+			\left(
+				\int_{x_{i-1}}^{x_i} q(x)(x-x_{i-1})dx -
+				\int_{x_{i}}^{x_{i+1}} q(x)(x_{i+1} - x)dx 
+			\right)
+			\qquad
+			i = \overline{1,N-1}
+		$$
+		$$
+			d_0=
+			\frac{2}{h^2}
+			\int_{0}^{h}q(x)(h-x)dx
+			\qquad				
+			d_N=
+			\frac{2}{h^2}
+			\int_{1-h}^{1}q(x)(x-1+h)dx
+		$$
+		$$
+			\varphi_i=
+			\frac{1}{h^2}
+			\left(
+				\int_{x_{i-1}}^{x_i}f(x)(x - x_{i-1})dx -
+				\int_{x_{i}}^{x_{i+1}}f(x)(x_{i+1} - x)dx 
+			\right)
+			\qquad
+			 i= \overline{1,N-1}
+		$$
+		$$
+			\varphi_0=
+			\frac{2}{h^2}
+			\int_{0}^{h}f(x)(h - x)dx
+			\qquad			
+			\varphi_N=
+			\frac{2}{h^2}
+			\int_{1-h}^{1}
+			f(x)(x - 1 + h)dx
+		$$
+		Решим образовавшуюся систему методом прогонки.
 	
 \section*{Результат}
 Средних:
